@@ -1,5 +1,3 @@
-FROM iheartmikes/sf-pushtopic
-
 EXPOSE 3001
 EXPOSE 3000
 EXPOSE 8080
