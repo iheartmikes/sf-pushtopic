@@ -15,6 +15,6 @@
      "Update": "true"
            },
   "command": [
-             "node bin/www"
+             "node ./bin/www"
              ],
 }
