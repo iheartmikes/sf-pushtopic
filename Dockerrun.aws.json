@@ -11,7 +11,7 @@
     }
   ],
   "Image": {
-     "Name": "iheartmikes/sfdc-pushtopic:latest",
+     "Name": "079127473663.dkr.ecr.us-east-1.amazonaws.com/sf-pushtopic",
      "Update": "true"
            },
   "command": [
