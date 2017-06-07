@@ -1,9 +1,10 @@
 {
-  "AWSEBDockerrunVersion": "1",
-  "Logging": "/tmp/sfdc-pushtopic01",
+  "AWSEBDockerrunVersion": "2",
+  "Logging": "/tmp/sf-pushtopic",
   "Ports": [
     {
       "ContainerPort": "3001",
+      "ContainerPort": "3000",
       "ContainerPort": "8888",
       "ContainerPort": "8080",
       "ContainerPort": "443"
@@ -14,7 +15,6 @@
      "Update": "true"
            },
   "command": [
-             "/bin/bash",
              "node bin/www"
-            ],
+             ],
 }
