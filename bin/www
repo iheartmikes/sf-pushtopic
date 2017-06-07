@@ -1,0 +1,98 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var cluster = require('cluster');
+var https = require('https');
+var jsforce = require('jsforce');
+var util = require('util');
+var apigw = require('aws-api-gateway-client').default;
+var config = require('getconfig');
+var username = config.sfdcConn.username; // "ihmintegrations@iheartmedia.com.crmuat"; //Need to pull this from ENV varable
+var password = config.sfdcConn.password; //"Th1sIsN0tSecure"; //Need to pull this from ENV varable
+var loginurl = config.sfdcConn.loginurl; //'https://test.salesforce.com';
+
+
+/**
+* Set up SFDC Listener for Push Topics
+**/
+
+//Callback methods
+function procAcctMkt(message){
+  console.log('AccountMKT Topic recieved :\n ' + util.inspect(message));
+  //Send message to APIGateway for processing
+  var method = 'POST';
+  var body = message;
+  var pathTemplate = '/sfdc/accountInjection';
+
+  var apigClient = apigw.newClient({
+    invokeUrl: config.apigateway,
+    apiKey: config.apikey
+  });
+
+  apigClient.invokeApi('', pathTemplate, method, '', body)
+  .then(function(result){
+    console.log('Success');
+  }).catch(function(result){
+    console.log(result);
+  });
+}
+
+function procMsgLog(message){
+  //Check if message log is relevant (Status = 'Ready to Send' and Event = 'Order Injection')
+    console.log('Message Log Topic recieved :\n ' + util.inspect(message));
+  if(message.sobject.Event__c === 'Order Injection' && message.sobject.Status__c === 'Ready to Send'){
+    //message qualifies ad order injection send to apigateway
+    console.log('Message Log Topic recieved :\n ' + util.inspect(message));
+    var method = 'POST';
+    var body = message;
+    var pathTemplate = '/sfdc/orderInjection';
+
+    var apigClient = apigw.newClient({
+      invokeUrl: config.apigateway,
+      apiKey: config.apikey
+    });
+
+    apigClient.invokeApi('', pathTemplate, method, '', body)
+      .then(function(result){
+        console.log('Success');
+      }).catch(function(result){
+        console.log(result);
+      });
+    }
+}
+
+if(cluster.isMaster){
+  cluster.fork();
+  console.log('Initial Fork');
+  cluster.on('exit', function(worker, code, signal){
+    console.log('Application has exited with the following info:\n @' + new Date() 
+      + '\nWorker: ' + util.inspect(worker) 
+      + '\nCode: ' + util.inspect(code) 
+      + '\nSignal: ' + util.inspect(signal));
+    cluster.fork();
+    console.log('Another Fork');
+  });
+}
+
+if(cluster.isWorker){
+  //Create Connection
+  conn = new jsforce.Connection({loginUrl:loginurl});
+
+  //Connect and subscribe
+  conn.login(username, password, function(err, res){
+    if(err){
+      return console.error(err);
+    }
+    //Subscribe to topics
+    var acctMkt = conn.streaming.topic('AccountMarketTopic').subscribe(procAcctMkt);
+    console.log('Account Market Topic Subscriber Online : ' + new Date());
+    var msgLog = conn.streaming.topic('MessageLogTopic').subscribe(procMsgLog);
+    console.log('Message Log Topic Subscriber Online : ' + new Date());
+  });
+}
+
+

@@ -1,0 +1,9 @@
+{
+    "sfdcConn": {
+        "username": "ihmintegrations@iheartmedia.com.crmuat",
+        "password": "Th1sIsN0tSecure",
+        "loginurl": "https://test.salesforce.com"
+    },
+    "apigateway": "https://dn2y8r6zrl.execute-api.us-east-1.amazonaws.com/dev",
+    "apikey": "FsMQXFOdsd5RfuHnfmUnAa8oikaW5D8H9gDW2n9G"
+}

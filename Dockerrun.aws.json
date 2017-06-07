@@ -1,0 +1,20 @@
+{
+  "AWSEBDockerrunVersion": "1",
+  "Logging": "/tmp/sfdc-pushtopic01",
+  "Ports": [
+    {
+      "ContainerPort": "3001",
+      "ContainerPort": "8888",
+      "ContainerPort": "8080",
+      "ContainerPort": "443"
+    }
+  ],
+  "Image": {
+     "Name": "079127473663.dkr.ecr.us-east-1.amazonaws.com/sf-pushtopic:latest",
+     "Update": "true"
+           },
+  "command": [
+             "/bin/bash",
+             "node bin/www"
+            ],
+}
