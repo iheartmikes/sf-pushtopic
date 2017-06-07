@@ -1,4 +1,4 @@
-FROM iheartmikes/sf-pushtopic
+FROM iheartmikes/sf-pushtopic:latest
 
 EXPOSE 3001
 EXPOSE 3000
